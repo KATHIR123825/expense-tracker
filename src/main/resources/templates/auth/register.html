@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Register — Expense Tracker</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        /* ============================================================
+           ALL STYLES EMBEDDED - NO EXTERNAL CSS NEEDED
+           ============================================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #0F172A 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .bg-shapes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg-shapes .shape {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.15;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .bg-shapes .shape:nth-child(1) {
+            width: 400px;
+            height: 400px;
+            background: #7C3AED;
+            top: -100px;
+            right: -100px;
+        }
+
+        .bg-shapes .shape:nth-child(2) {
+            width: 300px;
+            height: 300px;
+            background: #4F46E5;
+            bottom: -50px;
+            left: -50px;
+            animation-delay: -5s;
+        }
+
+        .bg-shapes .shape:nth-child(3) {
+            width: 200px;
+            height: 200px;
+            background: #06B6D4;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation-delay: -10s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -30px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+        }
+
+        .register-wrapper {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 480px;
+            animation: fadeInScale 0.6s ease-out forwards;
+        }
+
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.96); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .register-card {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 24px;
+            padding: 40px 32px 32px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        .register-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .register-header .logo {
+            font-size: 22px;
+            font-weight: 800;
+            color: #F2EFE9;
+        }
+
+        .register-header .logo span {
+            color: #E4A96F;
+        }
+
+        .register-header .logo i {
+            color: #E4A96F;
+            margin-right: 8px;
+        }
+
+        .register-header h1 {
+            font-size: 24px;
+            font-weight: 800;
+            color: #F2EFE9;
+            margin-top: 16px;
+        }
+
+        .register-header p {
+            color: #8E93A0;
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        .alert-danger {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 14px;
+            border-radius: 12px;
+            font-size: 13px;
+            margin-bottom: 18px;
+            background: rgba(242, 85, 90, 0.08);
+            color: #F2555A;
+            border: 1px solid rgba(242, 85, 90, 0.12);
+        }
+
+        .alert-danger i {
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #8E93A0;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+
+        .form-group .input-wrapper {
+            position: relative;
+        }
+
+        .form-group .input-wrapper i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #8E93A0;
+            font-size: 15px;
+        }
+
+        .form-group .input-wrapper input {
+            width: 100%;
+            padding: 12px 16px 12px 42px;
+            background: #1B1E26;
+            border: 1px solid #262A34;
+            border-radius: 12px;
+            color: #F2EFE9;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.15s ease;
+            outline: none;
+        }
+
+        .form-group .input-wrapper input:focus {
+            border-color: #E4A96F;
+            box-shadow: 0 0 0 3px rgba(228, 169, 111, 0.1);
+        }
+
+        .form-group .input-wrapper input:focus + i {
+            color: #E4A96F;
+        }
+
+        .form-group .input-wrapper input::placeholder {
+            color: #8E93A0;
+        }
+
+        .form-group .input-wrapper .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #8E93A0;
+            cursor: pointer;
+            font-size: 15px;
+            padding: 4px;
+        }
+
+        .form-group .input-wrapper .password-toggle:hover {
+            color: #F2EFE9;
+        }
+
+        .form-group .error-message {
+            color: #F2555A;
+            font-size: 12px;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .form-group .error-message.show {
+            display: block;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .password-strength-container {
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .password-strength-meter {
+            flex: 1;
+            min-width: 60px;
+            height: 4px;
+            background: #262A34;
+            border-radius: 100px;
+            overflow: hidden;
+        }
+
+        .password-strength-meter .fill {
+            height: 100%;
+            width: 0%;
+            border-radius: 100px;
+            transition: width 0.3s ease, background 0.3s ease;
+        }
+
+        .password-strength-text {
+            font-size: 12px;
+            font-weight: 500;
+            min-width: 70px;
+            text-align: right;
+            color: #8E93A0;
+        }
+
+        .btn-register {
+            width: 100%;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, #E4A96F, #d4945e);
+            color: #3A2A16;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 20px rgba(228, 169, 111, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(228, 169, 111, 0.35);
+        }
+
+        .btn-register:active {
+            transform: scale(0.98);
+        }
+
+        .btn-register i {
+            font-size: 16px;
+        }
+
+        .btn-register .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(0);
+            animation: rippleEffect 0.6s ease-out;
+            pointer-events: none;
+        }
+
+        @keyframes rippleEffect {
+            to { transform: scale(4); opacity: 0; }
+        }
+
+        .register-footer {
+            text-align: center;
+            margin-top: 18px;
+            color: #8E93A0;
+            font-size: 14px;
+        }
+
+        .register-footer a {
+            color: #E4A96F;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .register-footer a:hover {
+            color: #d4945e;
+        }
+
+        .register-footer .secure-text {
+            margin-top: 14px;
+            font-size: 12px;
+            color: #8E93A0;
+        }
+
+        .register-footer .secure-text i {
+            margin-right: 4px;
+        }
+
+        /* ============================================================
+           RESPONSIVE BREAKPOINTS
+           ============================================================ */
+
+        @media (max-width: 768px) {
+            .register-card {
+                padding: 32px 24px 28px;
+            }
+            .register-header h1 { font-size: 22px; }
+            .register-header .logo { font-size: 20px; }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 12px;
+                align-items: flex-start;
+                padding-top: 28px;
+            }
+            .register-card {
+                padding: 24px 18px 20px;
+                border-radius: 20px;
+            }
+            .register-header { margin-bottom: 18px; }
+            .register-header h1 { font-size: 20px; margin-top: 12px; }
+            .register-header .logo { font-size: 18px; }
+            .register-header p { font-size: 13px; }
+            .form-group { margin-bottom: 14px; }
+            .form-group label { font-size: 12px; }
+            .form-group .input-wrapper input {
+                padding: 11px 14px 11px 38px;
+                font-size: 13px;
+                border-radius: 10px;
+            }
+            .form-group .input-wrapper i { left: 12px; font-size: 14px; }
+            .form-group .input-wrapper .password-toggle { right: 10px; font-size: 14px; }
+            .form-row { grid-template-columns: 1fr; gap: 0; }
+            .password-strength-container { flex-wrap: wrap; gap: 8px; }
+            .password-strength-text { font-size: 11px; min-width: 60px; }
+            .btn-register { padding: 13px 16px; font-size: 14px; border-radius: 10px; }
+            .btn-register i { font-size: 14px; }
+            .alert-danger { padding: 10px 12px; font-size: 12px; border-radius: 10px; }
+            .alert-danger i { font-size: 14px; }
+            .register-footer { font-size: 13px; margin-top: 14px; }
+            .register-footer .secure-text { font-size: 11px; margin-top: 8px; }
+        }
+
+        @media (max-width: 360px) {
+            body { padding: 8px; padding-top: 16px; }
+            .register-card { padding: 16px 12px 14px; border-radius: 16px; }
+            .register-header h1 { font-size: 18px; }
+            .register-header .logo { font-size: 16px; }
+            .register-header p { font-size: 12px; }
+            .form-group .input-wrapper input {
+                padding: 10px 12px 10px 34px;
+                font-size: 12px;
+            }
+            .form-group .input-wrapper i { left: 10px; font-size: 12px; }
+            .btn-register { padding: 11px 14px; font-size: 13px; }
+            .register-footer { font-size: 12px; }
+        }
+
+        @media (max-height: 600px) and (orientation: landscape) {
+            body { padding: 12px; align-items: center; padding-top: 12px; }
+            .register-card { padding: 20px 24px; max-height: 95vh; overflow-y: auto; }
+            .register-header { margin-bottom: 12px; }
+            .register-header h1 { font-size: 18px; margin-top: 8px; }
+            .register-header .logo { font-size: 16px; }
+            .register-header p { font-size: 12px; }
+            .form-group { margin-bottom: 10px; }
+            .form-group .input-wrapper input {
+                padding: 9px 12px 9px 36px;
+                font-size: 13px;
+            }
+            .btn-register { padding: 10px 16px; font-size: 14px; }
+            .register-footer { margin-top: 12px; font-size: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg-shapes">
+    <div class="shape"></div>
+    <div class="shape"></div>
+    <div class="shape"></div>
+</div>
+
+<div class="register-wrapper">
+    <div class="register-card">
+
+        <div class="register-header">
+            <div class="logo">
+                <i class="fas fa-wallet"></i> Expense<span>Tracker</span>
+            </div>
+            <h1>Create Account</h1>
+            <p>Start tracking your expenses today</p>
+        </div>
+
+        <div th:if="${error}" class="alert-danger">
+            <i class="fas fa-exclamation-circle"></i>
+            <span th:text="${error}">Registration failed</span>
+        </div>
+
+        <form th:action="@{/register}" th:object="${user}" method="post">
+
+            <div class="form-group">
+                <label>Username</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-user"></i>
+                    <input type="text" th:field="*{username}" placeholder="Choose a username" required>
+                </div>
+                <span class="error-message" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></span>
+            </div>
+
+            <div class="form-group">
+                <label>Email</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" th:field="*{email}" placeholder="Enter your email" required>
+                </div>
+                <span class="error-message" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>First Name</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-user"></i>
+                        <input type="text" th:field="*{firstName}" placeholder="First name" required>
+                    </div>
+                    <span class="error-message" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></span>
+                </div>
+                <div class="form-group">
+                    <label>Last Name</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-user"></i>
+                        <input type="text" th:field="*{lastName}" placeholder="Last name">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Password</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" th:field="*{password}" id="registerPassword" placeholder="Create a strong password" required>
+                    <button type="button" class="password-toggle" onclick="toggleRegisterPassword()">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+
+                <div class="password-strength-container">
+                    <div class="password-strength-meter">
+                        <div class="fill" id="strengthFill"></div>
+                    </div>
+                    <span class="password-strength-text" id="strengthText">Very Weak</span>
+                </div>
+
+                <span class="error-message" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
+            </div>
+
+            <button type="submit" class="btn-register" id="registerBtn">
+                <i class="fas fa-user-plus"></i> Create Account
+            </button>
+
+        </form>
+
+        <div class="register-footer">
+            <p>Already have an account? <a href="/login">Sign in</a></p>
+            <p class="secure-text">
+                <i class="fas fa-lock"></i> Secure &bull; Encrypted &bull; Private
+            </p>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    function toggleRegisterPassword() {
+        const input = document.getElementById('registerPassword');
+        const icon = document.querySelector('.password-toggle i');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.className = 'fas fa-eye-slash';
+        } else {
+            input.type = 'password';
+            icon.className = 'fas fa-eye';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Password Strength Meter
+        const passwordInput = document.getElementById('registerPassword');
+        const strengthFill = document.getElementById('strengthFill');
+        const strengthText = document.getElementById('strengthText');
+
+        if (passwordInput && strengthFill && strengthText) {
+            passwordInput.addEventListener('input', function() {
+                const value = this.value;
+                let score = 0;
+                if (value.length >= 8) score++;
+                if (value.length >= 12) score++;
+                if (/[a-z]/.test(value) && /[A-Z]/.test(value)) score++;
+                if (/\d/.test(value)) score++;
+                if (/[^a-zA-Z0-9]/.test(value)) score++;
+                score = Math.min(score, 4);
+
+                const percentage = (score / 4) * 100;
+                const colors = ['#EF4444', '#F59E0B', '#F59E0B', '#10B981', '#10B981'];
+                const labels = ['Very Weak', 'Weak', 'Medium', 'Strong', 'Very Strong'];
+
+                strengthFill.style.width = percentage + '%';
+                strengthFill.style.background = colors[score];
+                strengthText.textContent = labels[score];
+                strengthText.style.color = colors[score];
+            });
+        }
+
+        // Ripple Effect
+        const btn = document.getElementById('registerBtn');
+        if (btn) {
+            btn.addEventListener('click', function(e) {
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+                const ripple = document.createElement('span');
+                ripple.className = 'ripple';
+                ripple.style.width = size + 'px';
+                ripple.style.height = size + 'px';
+                ripple.style.left = x + 'px';
+                ripple.style.top = y + 'px';
+                this.appendChild(ripple);
+                setTimeout(function() { ripple.remove(); }, 600);
+            });
+        }
+
+        // Show validation errors
+        const errorMessages = document.querySelectorAll('.error-message');
+        errorMessages.forEach(function(msg) {
+            if (msg.textContent.trim() !== '') {
+                msg.classList.add('show');
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

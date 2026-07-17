@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard — Expense Tracker</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <!-- Styles -->
+    <style>
+        /* ============================================================
+           RESET & BASE
+           ============================================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #111318;
+            color: #F2EFE9;
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #111318;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #262A34;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #E4A96F;
+        }
+
+        /* ============================================================
+           NAVBAR
+           ============================================================ */
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(17, 19, 24, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(38, 42, 52, 0.6);
+            padding: 0 32px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .navbar-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: #F2EFE9;
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .navbar-logo .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #E4A96F, #d4945e);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: #3A2A16;
+        }
+
+        .navbar-logo span {
+            color: #E4A96F;
+        }
+
+        .navbar-nav {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            list-style: none;
+            margin: 0 24px;
+        }
+
+        .navbar-nav a {
+            color: #8E93A0;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.15s ease;
+            position: relative;
+        }
+
+        .navbar-nav a:hover {
+            color: #F2EFE9;
+            background: rgba(38, 42, 52, 0.5);
+        }
+
+        .navbar-nav a.active {
+            color: #F2EFE9;
+            background: rgba(38, 42, 52, 0.5);
+        }
+
+        .navbar-nav a.active::after {
+            content: '';
+            position: absolute;
+            bottom: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 2px;
+            border-radius: 2px;
+            background: #E4A96F;
+        }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .navbar-user {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 4px 12px 4px 4px;
+            border-radius: 100px;
+            background: rgba(38, 42, 52, 0.3);
+            border: 1px solid rgba(38, 42, 52, 0.5);
+            transition: all 0.15s ease;
+        }
+
+        .navbar-user:hover {
+            border-color: rgba(228, 169, 111, 0.3);
+        }
+
+        .navbar-user .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #E4A96F, #d4945e);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: #3A2A16;
+            text-transform: uppercase;
+        }
+
+        .navbar-user .username {
+            font-size: 13px;
+            font-weight: 500;
+            color: #F2EFE9;
+        }
+
+        .navbar-user .logout-btn {
+            background: none;
+            border: none;
+            color: #8E93A0;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: all 0.15s ease;
+        }
+
+        .navbar-user .logout-btn:hover {
+            color: #F2555A;
+            background: rgba(242, 85, 90, 0.1);
+        }
+
+        .nav-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: #F2EFE9;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 4px 8px;
+        }
+
+        /* ============================================================
+           CONTAINER
+           ============================================================ */
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 32px 32px 60px;
+        }
+
+        /* ============================================================
+           PAGE HEADER
+           ============================================================ */
+        .page-header {
+            margin-bottom: 32px;
+            animation: fadeInUp 0.4s ease forwards;
+        }
+
+        .page-header h1 {
+            font-size: 28px;
+            font-weight: 800;
+            color: #F2EFE9;
+            letter-spacing: -0.5px;
+            margin-bottom: 4px;
+        }
+
+        .page-header p {
+            color: #8E93A0;
+            font-size: 15px;
+        }
+
+        .page-header p strong {
+            color: #F2EFE9;
+            font-weight: 600;
+        }
+
+        .page-header p .month-highlight {
+            color: #E4A96F;
+            font-weight: 600;
+        }
+
+        /* ============================================================
+           STATS GRID
+           ============================================================ */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: #1B1E26;
+            border-radius: 16px;
+            padding: 24px 24px 20px;
+            border: 1px solid #262A34;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+            transition: all 0.2s ease;
+            cursor: default;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            border-radius: 2px 2px 0 0;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+            border-color: rgba(228, 169, 111, 0.15);
+        }
+
+        .stat-card:hover::before {
+            opacity: 1;
+        }
+
+        .stat-card.primary::before { background: #E4A96F; }
+        .stat-card.success::before { background: #4ADE9B; }
+        .stat-card.warning::before { background: #E4A96F; }
+        .stat-card.danger::before { background: #F2555A; }
+
+        .stat-card .stat-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .stat-card .stat-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .stat-card .stat-icon.gold {
+            background: rgba(228, 169, 111, 0.12);
+            color: #E4A96F;
+        }
+        .stat-card .stat-icon.green {
+            background: rgba(74, 222, 155, 0.12);
+            color: #4ADE9B;
+        }
+        .stat-card .stat-icon.red {
+            background: rgba(242, 85, 90, 0.12);
+            color: #F2555A;
+        }
+        .stat-card .stat-icon.gold-light {
+            background: rgba(228, 169, 111, 0.08);
+            color: #E4A96F;
+        }
+
+        .stat-card .stat-label {
+            color: #8E93A0;
+            font-size: 13px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .stat-card .stat-value {
+            font-size: 32px;
+            font-weight: 800;
+            color: #F2EFE9;
+            letter-spacing: -0.5px;
+            line-height: 1.2;
+        }
+
+        .stat-card .stat-value.gold { color: #E4A96F; }
+        .stat-card .stat-value.green { color: #4ADE9B; }
+        .stat-card .stat-value.red { color: #F2555A; }
+
+        .stat-card .stat-sub {
+            font-size: 12px;
+            color: #8E93A0;
+            margin-top: 6px;
+        }
+
+        /* ============================================================
+           TWO COLUMN LAYOUT
+           ============================================================ */
+        .two-column {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        /* ============================================================
+           SECTION HEADER
+           ============================================================ */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .section-header h2 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #F2EFE9;
+            letter-spacing: -0.3px;
+        }
+
+        .section-header .view-all {
+            color: #8E93A0;
+            font-size: 13px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: color 0.15s ease;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .section-header .view-all:hover {
+            color: #E4A96F;
+        }
+
+        .section-header .view-all i {
+            font-size: 11px;
+        }
+
+        /* ============================================================
+           EXPENSE TABLE
+           ============================================================ */
+        .table-wrapper {
+            background: #1B1E26;
+            border-radius: 16px;
+            border: 1px solid #262A34;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+        }
+
+        .expense-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .expense-table thead {
+            background: rgba(17, 19, 24, 0.5);
+        }
+
+        .expense-table thead th {
+            padding: 14px 20px;
+            text-align: left;
+            color: #8E93A0;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            border-bottom: 1px solid #262A34;
+        }
+
+        .expense-table tbody td {
+            padding: 14px 20px;
+            border-bottom: 1px solid rgba(38, 42, 52, 0.5);
+            color: #F2EFE9;
+            font-size: 14px;
+        }
+
+        .expense-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .expense-table tbody tr:hover td {
+            background: rgba(38, 42, 52, 0.3);
+        }
+
+        .expense-table .category-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 100px;
+            background: rgba(228, 169, 111, 0.1);
+            color: #E4A96F;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .expense-table .category-badge i {
+            font-size: 11px;
+        }
+
+        .expense-table .amount-col {
+            font-weight: 600;
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .expense-table .amount-col.positive {
+            color: #4ADE9B;
+        }
+
+        .expense-table .amount-col.negative {
+            color: #F2555A;
+        }
+
+        .expense-table .empty-state {
+            text-align: center;
+            padding: 48px 20px;
+            color: #8E93A0;
+        }
+
+        .expense-table .empty-state .empty-icon {
+            font-size: 40px;
+            color: #262A34;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .expense-table .empty-state a {
+            color: #E4A96F;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.15s ease;
+        }
+
+        .expense-table .empty-state a:hover {
+            color: #d4945e;
+        }
+
+        /* ============================================================
+           BUDGET CARDS (Right Column)
+           ============================================================ */
+        .budget-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .budget-item {
+            background: #1B1E26;
+            border-radius: 16px;
+            padding: 18px 20px 16px;
+            border: 1px solid #262A34;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+            transition: all 0.2s ease;
+        }
+
+        .budget-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+            border-color: rgba(228, 169, 111, 0.1);
+        }
+
+        .budget-item .budget-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .budget-item .budget-category {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            color: #F2EFE9;
+            font-size: 14px;
+        }
+
+        .budget-item .budget-category i {
+            color: #E4A96F;
+            font-size: 14px;
+        }
+
+        .budget-item .budget-amounts {
+            font-size: 13px;
+            color: #8E93A0;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .budget-item .budget-amounts strong {
+            color: #F2EFE9;
+            font-weight: 600;
+        }
+
+        .budget-item .budget-bar {
+            width: 100%;
+            height: 5px;
+            background: #262A34;
+            border-radius: 100px;
+            overflow: hidden;
+            margin: 10px 0 6px;
+            position: relative;
+        }
+
+        .budget-item .budget-bar .fill {
+            height: 100%;
+            border-radius: 100px;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .budget-item .budget-bar .fill.success {
+            background: linear-gradient(90deg, #4ADE9B, #2ecc71);
+        }
+        .budget-item .budget-bar .fill.warning {
+            background: linear-gradient(90deg, #E4A96F, #d4945e);
+            box-shadow: 0 0 20px rgba(228, 169, 111, 0.2);
+        }
+        .budget-item .budget-bar .fill.danger {
+            background: linear-gradient(90deg, #F2555A, #e74c3c);
+            box-shadow: 0 0 20px rgba(242, 85, 90, 0.2);
+        }
+
+        .budget-item .budget-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 4px;
+        }
+
+        .budget-item .budget-footer .percentage {
+            font-size: 12px;
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .budget-item .budget-footer .percentage.under {
+            color: #4ADE9B;
+        }
+
+        .budget-item .budget-footer .percentage.over {
+            color: #F2555A;
+        }
+
+        .budget-item .budget-footer .status-badge {
+            font-size: 11px;
+            font-weight: 500;
+            padding: 3px 12px;
+            border-radius: 100px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .budget-item .budget-footer .status-badge.on-track {
+            background: rgba(74, 222, 155, 0.1);
+            color: #4ADE9B;
+        }
+
+        .budget-item .budget-footer .status-badge.over {
+            background: rgba(242, 85, 90, 0.1);
+            color: #F2555A;
+        }
+
+        .budget-item .budget-footer .status-badge i {
+            font-size: 11px;
+        }
+
+        .budget-empty {
+            background: #1B1E26;
+            border-radius: 16px;
+            padding: 32px 20px;
+            text-align: center;
+            border: 1px solid #262A34;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        .budget-empty p {
+            color: #8E93A0;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .budget-empty a {
+            color: #E4A96F;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.15s ease;
+        }
+
+        .budget-empty a:hover {
+            color: #d4945e;
+        }
+
+        /* ============================================================
+           ADD EXPENSE BUTTON
+           ============================================================ */
+        .add-expense-wrapper {
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 32px;
+            background: linear-gradient(135deg, #E4A96F, #d4945e);
+            color: #3A2A16;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            box-shadow: 0 4px 20px rgba(228, 169, 111, 0.25);
+            letter-spacing: -0.2px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px) scale(1.01);
+            box-shadow: 0 8px 30px rgba(228, 169, 111, 0.35);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary i {
+            font-size: 16px;
+        }
+
+        /* ============================================================
+           ANIMATIONS
+           ============================================================ */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-in {
+            animation: fadeInUp 0.4s ease forwards;
+        }
+
+        .delay-1 { animation-delay: 0.05s; }
+        .delay-2 { animation-delay: 0.10s; }
+        .delay-3 { animation-delay: 0.15s; }
+        .delay-4 { animation-delay: 0.20s; }
+        .delay-5 { animation-delay: 0.25s; }
+
+        /* ============================================================
+           RESPONSIVE
+           ============================================================ */
+        @media (max-width: 1024px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 0 16px;
+            }
+
+            .navbar-nav {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 64px;
+                left: 0;
+                right: 0;
+                background: #1B1E26;
+                border-bottom: 1px solid #262A34;
+                padding: 8px 16px;
+                gap: 2px;
+                margin: 0;
+            }
+
+            .navbar-nav.open {
+                display: flex;
+            }
+
+            .navbar-nav a {
+                padding: 10px 12px;
+                width: 100%;
+            }
+
+            .navbar-nav a.active::after {
+                display: none;
+            }
+
+            .nav-toggle {
+                display: block;
+            }
+
+            .container {
+                padding: 20px 16px 40px;
+            }
+
+            .page-header h1 {
+                font-size: 22px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+            }
+
+            .stat-card {
+                padding: 18px 16px 16px;
+            }
+
+            .stat-card .stat-value {
+                font-size: 24px;
+            }
+
+            .stat-card .stat-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 15px;
+            }
+
+            .expense-table thead th,
+            .expense-table tbody td {
+                padding: 10px 14px;
+                font-size: 13px;
+            }
+
+            .expense-table .hide-mobile {
+                display: none;
+            }
+
+            .navbar-user .username {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-card .stat-value {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ============================================================
+NAVBAR
+============================================================ -->
+<nav class="navbar">
+    <div class="navbar-left">
+        <button class="nav-toggle" aria-label="Toggle navigation">
+            <i class="fas fa-bars"></i>
+        </button>
+        <a href="/dashboard" class="navbar-logo">
+            <span class="logo-icon"><i class="fas fa-wallet"></i></span>
+            Expense<span>Tracker</span>
+        </a>
+        <ul class="navbar-nav" id="navbarNav">
+            <li><a href="/dashboard" class="active"><i class="fas fa-th-large" style="margin-right: 6px;"></i> Dashboard</a></li>
+            <li><a href="/expenses"><i class="fas fa-receipt" style="margin-right: 6px;"></i> Expenses</a></li>
+            <li><a href="/categories"><i class="fas fa-tags" style="margin-right: 6px;"></i> Categories</a></li>
+            <li><a href="/budgets"><i class="fas fa-piggy-bank" style="margin-right: 6px;"></i> Budgets</a></li>
+        </ul>
+    </div>
+    <div class="navbar-right">
+        <div class="navbar-user">
+            <span class="avatar" th:text="${#strings.substring(username, 0, 1)}">U</span>
+            <span class="username" th:text="${username}">User</span>
+            <form th:action="@{/logout}" method="post" style="display:inline;">
+                <button type="submit" class="logout-btn"><i class="fas fa-sign-out-alt"></i></button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<!-- ============================================================
+MAIN CONTENT
+============================================================ -->
+<div class="container">
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>Dashboard</h1>
+        <p>
+            Welcome back, <strong th:text="${username}">User</strong>!
+            Here's your financial overview for
+            <span class="month-highlight" th:text="${currentMonth}">July 2026</span>.
+        </p>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+        <div class="stat-card primary animate-in delay-1">
+            <div class="stat-top">
+                <span class="stat-icon gold"><i class="fas fa-coins"></i></span>
+                <span class="stat-label">Total Expenses</span>
+            </div>
+            <div class="stat-value gold">₹<span th:text="${#numbers.formatDecimal(totalExpenses, 0, 2)}">0.00</span></div>
+            <div class="stat-sub">This month</div>
+        </div>
+
+        <div class="stat-card success animate-in delay-2">
+            <div class="stat-top">
+                <span class="stat-icon green"><i class="fas fa-chart-line"></i></span>
+                <span class="stat-label">Total Budget</span>
+            </div>
+            <div class="stat-value green">₹<span th:text="${#numbers.formatDecimal(totalBudgetLimit, 0, 2)}">0.00</span></div>
+            <div class="stat-sub">Monthly limit</div>
+        </div>
+
+        <div class="stat-card warning animate-in delay-3">
+            <div class="stat-top">
+                <span class="stat-icon gold-light"><i class="fas fa-percent"></i></span>
+                <span class="stat-label">Budget Usage</span>
+            </div>
+            <div class="stat-value gold"><span th:text="${#numbers.formatDecimal(budgetUsage, 0, 1)}">0.0</span>%</div>
+            <div class="stat-sub" th:text="${budgetUsage > 80 ? '⚠️ Approaching limit' : 'On track'}">On track</div>
+        </div>
+
+        <div class="stat-card danger animate-in delay-4">
+            <div class="stat-top">
+                <span class="stat-icon red"><i class="fas fa-exclamation-triangle"></i></span>
+                <span class="stat-label">Exceeded Budgets</span>
+            </div>
+            <div class="stat-value red" th:text="${exceededBudgets.size()}">0</div>
+            <div class="stat-sub" th:text="${exceededBudgets.size()} == 0 ? '✅ All budgets on track' : '⚠️ Needs attention'">All budgets on track</div>
+        </div>
+    </div>
+
+    <!-- Two Column Layout -->
+    <div class="two-column">
+
+        <!-- Recent Expenses -->
+        <div class="animate-in delay-2">
+            <div class="section-header">
+                <h2><i class="fas fa-clock" style="color:#E4A96F; margin-right: 8px;"></i> Recent Expenses</h2>
+                <a href="/expenses" class="view-all">
+                    View All <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            <div class="table-wrapper">
+                <table class="expense-table">
+                    <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Description</th>
+                        <th>Category</th>
+                        <th class="hide-mobile">Amount</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="expense : ${recentExpenses}" th:if="${recentExpenses != null and !recentExpenses.empty}">
+                        <td th:text="${#dates.format(expense.date, 'dd MMM yyyy')}">15 Jul 2026</td>
+                        <td th:text="${expense.description}">Lunch with team</td>
+                        <td>
+                                    <span class="category-badge">
+                                        <i class="fas fa-tag"></i>
+                                        <span th:text="${expense.categoryName}">Food</span>
+                                    </span>
+                        </td>
+                        <td class="amount-col positive">₹<span th:text="${#numbers.formatDecimal(expense.amount, 0, 2)}">45.50</span></td>
+                    </tr>
+                    <tr th:if="${recentExpenses == null or recentExpenses.empty}">
+                        <td colspan="4" class="empty-state">
+                            <span class="empty-icon"><i class="fas fa-receipt"></i></span>
+                            No recent expenses found.<br>
+                            <a href="/expenses/add">Add your first expense</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Monthly Budgets -->
+        <div class="animate-in delay-3">
+            <div class="section-header">
+                <h2><i class="fas fa-pie-chart" style="color:#E4A96F; margin-right: 8px;"></i> Monthly Budgets</h2>
+                <a href="/budgets" class="view-all">
+                    Manage <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            <div class="budget-list">
+                <div th:each="budget : ${budgets}" class="budget-item">
+                    <div class="budget-header">
+                            <span class="budget-category">
+                                <i class="fas fa-tag"></i>
+                                <span th:text="${budget.categoryName}">Food</span>
+                            </span>
+                        <span class="budget-amounts">
+                                ₹<span th:text="${#numbers.formatDecimal(budget.spentAmount, 0, 2)}">0.00</span>
+                                / ₹<span th:text="${#numbers.formatDecimal(budget.limitAmount, 0, 2)}">0.00</span>
+                            </span>
+                    </div>
+                    <div class="budget-bar">
+                        <div class="fill"
+                             th:classappend="${budget.percentageUsed > 100} ? 'danger' : (${budget.percentageUsed > 80} ? 'warning' : 'success')"
+                             th:style="'width: ' + ${budget.percentageUsed} + '%'">
+                        </div>
+                    </div>
+                    <div class="budget-footer">
+                            <span class="percentage"
+                                  th:classappend="${budget.percentageUsed > 100} ? 'over' : 'under'"
+                                  th:text="${#numbers.formatDecimal(budget.percentageUsed, 0, 1)} + '% used'">
+                                75% used
+                            </span>
+                        <span class="status-badge"
+                              th:classappend="${budget.percentageUsed > 100} ? 'over' : 'on-track'">
+                                <i class="fas"
+                                   th:classappend="${budget.percentageUsed > 100} ? 'fa-exclamation-circle' : 'fa-check-circle'"></i>
+                                <span th:if="${budget.percentageUsed > 100}">Over</span>
+                                <span th:if="${budget.percentageUsed <= 100}">On track</span>
+                            </span>
+                    </div>
+                </div>
+
+                <div th:if="${budgets == null or budgets.empty}" class="budget-empty">
+                    <p><i class="fas fa-piggy-bank" style="font-size:28px; color:#262A34; display:block; margin-bottom:8px;"></i>
+                        No budgets set for this month.</p>
+                    <a href="/budgets/add">Set your first budget</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Add Expense Button -->
+    <div class="add-expense-wrapper animate-in delay-4">
+        <a href="/expenses/add" class="btn-primary">
+            <i class="fas fa-plus-circle"></i> Add New Expense
+        </a>
+    </div>
+
+</div>
+
+<!-- ============================================================
+JAVASCRIPT
+============================================================ -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+
+        // Mobile nav toggle
+        const toggleBtn = document.querySelector('.nav-toggle');
+        const nav = document.querySelector('.navbar-nav');
+
+        if (toggleBtn && nav) {
+            toggleBtn.addEventListener('click', function() {
+                nav.classList.toggle('open');
+            });
+
+            // Close nav on link click (mobile)
+            nav.querySelectorAll('a').forEach(function(link) {
+                link.addEventListener('click', function() {
+                    nav.classList.remove('open');
+                });
+            });
+        }
+
+        // Close nav on outside click
+        document.addEventListener('click', function(e) {
+            if (nav && nav.classList.contains('open')) {
+                const isNav = nav.contains(e.target);
+                const isToggle = toggleBtn && toggleBtn.contains(e.target);
+                if (!isNav && !isToggle) {
+                    nav.classList.remove('open');
+                }
+            }
+        });
+
+        // Animate progress bars on load
+        const bars = document.querySelectorAll('.budget-bar .fill');
+        bars.forEach(function(bar) {
+            const targetWidth = bar.style.width;
+            bar.style.width = '0%';
+            setTimeout(function() {
+                bar.style.width = targetWidth;
+            }, 300);
+        });
+
+    });
+</script>
+
+</body>
+</html>

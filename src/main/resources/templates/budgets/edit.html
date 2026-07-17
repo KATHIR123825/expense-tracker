@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Budget — Expense Tracker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #111318;
+            color: #F2EFE9;
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #111318; }
+        ::-webkit-scrollbar-thumb { background: #262A34; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #E4A96F; }
+
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(17, 19, 24, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(38, 42, 52, 0.6);
+            padding: 0 32px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .navbar-left { display: flex; align-items: center; gap: 12px; }
+        .navbar-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: #F2EFE9;
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+        .navbar-logo .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #E4A96F, #d4945e);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: #3A2A16;
+        }
+        .navbar-logo span { color: #E4A96F; }
+        .navbar-nav {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            list-style: none;
+            margin: 0 24px;
+        }
+        .navbar-nav a {
+            color: #8E93A0;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.15s ease;
+            position: relative;
+        }
+        .navbar-nav a:hover { color: #F2EFE9; background: rgba(38, 42, 52, 0.5); }
+        .navbar-nav a.active { color: #F2EFE9; background: rgba(38, 42, 52, 0.5); }
+        .navbar-nav a.active::after {
+            content: '';
+            position: absolute;
+            bottom: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 2px;
+            border-radius: 2px;
+            background: #E4A96F;
+        }
+        .navbar-right { display: flex; align-items: center; gap: 16px; }
+        .navbar-user {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 4px 12px 4px 4px;
+            border-radius: 100px;
+            background: rgba(38, 42, 52, 0.3);
+            border: 1px solid rgba(38, 42, 52, 0.5);
+            transition: all 0.15s ease;
+        }
+        .navbar-user:hover { border-color: rgba(228, 169, 111, 0.3); }
+        .navbar-user .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #E4A96F, #d4945e);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: #3A2A16;
+            text-transform: uppercase;
+        }
+        .navbar-user .username { font-size: 13px; font-weight: 500; color: #F2EFE9; }
+        .navbar-user .logout-btn {
+            background: none;
+            border: none;
+            color: #8E93A0;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: all 0.15s ease;
+        }
+        .navbar-user .logout-btn:hover { color: #F2555A; background: rgba(242, 85, 90, 0.1); }
+        .nav-toggle { display: none; background: none; border: none; color: #F2EFE9; font-size: 20px; cursor: pointer; padding: 4px 8px; }
+
+        .container { max-width: 640px; margin: 0 auto; padding: 32px 24px 60px; }
+
+        .form-card {
+            background: #1B1E26;
+            border-radius: 16px;
+            border: 1px solid #262A34;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+            padding: 32px 32px 36px;
+            animation: fadeInUp 0.4s ease forwards;
+        }
+        .form-card-header {
+            margin-bottom: 28px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #262A34;
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+        }
+        .form-card-header .header-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: rgba(228, 169, 111, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #E4A96F;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        .form-card-header .header-content h1 {
+            font-size: 24px;
+            font-weight: 800;
+            color: #F2EFE9;
+            letter-spacing: -0.5px;
+        }
+        .form-card-header .header-content p { color: #8E93A0; font-size: 14px; margin-top: 2px; }
+        .form-card-header .header-content .budget-id {
+            color: #8E93A0;
+            font-size: 12px;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .form-card-header .header-content .budget-id span { color: #F2EFE9; font-weight: 500; }
+
+        .info-box {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 20px;
+            background: rgba(228, 169, 111, 0.06);
+            border: 1px solid rgba(228, 169, 111, 0.08);
+            border-radius: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+        .info-box .info-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #8E93A0;
+            font-size: 14px;
+        }
+        .info-box .info-item i { color: #E4A96F; font-size: 14px; }
+        .info-box .info-item strong { color: #F2EFE9; }
+        .info-box .info-item .status-text { font-weight: 600; }
+        .info-box .info-item .status-text.over { color: #F2555A; }
+        .info-box .info-item .status-text.under { color: #4ADE9B; }
+        .info-box .divider { color: #262A34; font-size: 18px; }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #8E93A0;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+        .form-group label i { color: #E4A96F; font-size: 14px; width: 18px; }
+        .form-group .input-wrapper { position: relative; }
+        .form-group select,
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            background: #111318;
+            border: 1px solid #262A34;
+            border-radius: 12px;
+            color: #F2EFE9;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.15s ease;
+            outline: none;
+        }
+        /* REMOVE NUMBER INPUT SPINNERS */
+        .form-group input[type="number"] {
+            -moz-appearance: textfield;
+            appearance: textfield;
+        }
+        .form-group input[type="number"]::-webkit-outer-spin-button,
+        .form-group input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .form-group select:focus,
+        .form-group input:focus {
+            border-color: #E4A96F;
+            box-shadow: 0 0 0 3px rgba(228, 169, 111, 0.1);
+        }
+        .form-group select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238E93A0' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            padding-right: 40px;
+            cursor: pointer;
+        }
+        .form-group select option { background: #1B1E26; color: #F2EFE9; }
+        .form-group input::placeholder { color: #8E93A0; }
+
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 8px;
+            padding-top: 20px;
+            border-top: 1px solid #262A34;
+        }
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 28px;
+            background: linear-gradient(135deg, #E4A96F, #d4945e);
+            color: #3A2A16;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            box-shadow: 0 4px 20px rgba(228, 169, 111, 0.25);
+            letter-spacing: -0.2px;
+            flex: 1;
+            justify-content: center;
+        }
+        .btn-primary:hover { transform: translateY(-2px) scale(1.01); box-shadow: 0 8px 30px rgba(228, 169, 111, 0.35); }
+        .btn-primary:active { transform: scale(0.98); }
+        .btn-primary i { font-size: 16px; }
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: transparent;
+            color: #8E93A0;
+            border: 1px solid #262A34;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            text-decoration: none;
+            justify-content: center;
+            flex: 1;
+        }
+        .btn-secondary:hover { color: #F2EFE9; border-color: #E4A96F; }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .navbar { padding: 0 16px; }
+            .navbar-nav {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 64px;
+                left: 0;
+                right: 0;
+                background: #1B1E26;
+                border-bottom: 1px solid #262A34;
+                padding: 8px 16px;
+                gap: 2px;
+                margin: 0;
+            }
+            .navbar-nav.open { display: flex; }
+            .navbar-nav a { padding: 10px 12px; width: 100%; }
+            .navbar-nav a.active::after { display: none; }
+            .nav-toggle { display: block; }
+            .container { padding: 20px 16px 40px; }
+            .form-card { padding: 24px 20px 28px; }
+            .form-card-header .header-icon { width: 40px; height: 40px; font-size: 16px; }
+            .form-card-header .header-content h1 { font-size: 20px; }
+            .form-actions { flex-direction: column; }
+            .btn-primary, .btn-secondary { flex: none; width: 100%; justify-content: center; }
+            .navbar-user .username { display: none; }
+            .info-box { flex-direction: column; align-items: flex-start; gap: 8px; }
+            .info-box .divider { display: none; }
+        }
+        @media (max-width: 480px) {
+            .form-card { padding: 20px 16px 24px; }
+            .form-card-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+    <div class="navbar-left">
+        <button class="nav-toggle" aria-label="Toggle navigation">
+            <i class="fas fa-bars"></i>
+        </button>
+        <a href="/dashboard" class="navbar-logo">
+            <span class="logo-icon"><i class="fas fa-wallet"></i></span>
+            Expense<span>Tracker</span>
+        </a>
+        <ul class="navbar-nav" id="navbarNav">
+            <li><a href="/dashboard"><i class="fas fa-th-large" style="margin-right: 6px;"></i> Dashboard</a></li>
+            <li><a href="/expenses"><i class="fas fa-receipt" style="margin-right: 6px;"></i> Expenses</a></li>
+            <li><a href="/categories"><i class="fas fa-tags" style="margin-right: 6px;"></i> Categories</a></li>
+            <li><a href="/budgets" class="active"><i class="fas fa-piggy-bank" style="margin-right: 6px;"></i> Budgets</a></li>
+        </ul>
+    </div>
+    <div class="navbar-right">
+        <div class="navbar-user">
+            <span class="avatar" th:text="${#strings.substring(username, 0, 1)}">U</span>
+            <span class="username" th:text="${username}">User</span>
+            <form th:action="@{/logout}" method="post" style="display:inline;">
+                <button type="submit" class="logout-btn"><i class="fas fa-sign-out-alt"></i></button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<div class="container">
+    <div class="form-card">
+
+        <!-- Header -->
+        <div class="form-card-header">
+            <div class="header-icon"><i class="fas fa-pen"></i></div>
+            <div class="header-content">
+                <h1>Edit Budget</h1>
+                <p>Update your monthly spending limit</p>
+                <div class="budget-id">
+                    <i class="fas fa-hashtag"></i>
+                    Budget ID: <span th:text="${budget.id}">1</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info Box -->
+        <div class="info-box">
+            <div class="info-item">
+                <i class="fas fa-tag"></i>
+                Category: <strong th:text="${budget.categoryName}">Food</strong>
+            </div>
+            <span class="divider">|</span>
+            <div class="info-item">
+                <i class="fas fa-rupee-sign"></i>
+                Spent: <strong>₹<span th:text="${#numbers.formatDecimal(budget.spentAmount, 0, 2)}">0.00</span></strong>
+            </div>
+            <span class="divider">|</span>
+            <div class="info-item">
+                <i class="fas fa-percent"></i>
+                Usage:
+                <strong class="status-text"
+                        th:classappend="${budget.percentageUsed > 100} ? 'over' : 'under'"
+                        th:text="${#numbers.formatDecimal(budget.percentageUsed, 0, 1)} + '%'">
+                    75%
+                </strong>
+            </div>
+        </div>
+
+        <!-- Form -->
+        <form th:action="@{/budgets/edit/{id}(id=${budget.id})}" method="post">
+
+            <div class="form-group">
+                <label><i class="fas fa-tag"></i> Category</label>
+                <div class="input-wrapper">
+                    <select disabled style="opacity: 0.6; cursor: not-allowed;">
+                        <option th:value="${budget.categoryId}" th:text="${budget.categoryName}" selected></option>
+                    </select>
+                    <input type="hidden" name="categoryId" th:value="${budget.categoryId}">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label><i class="fas fa-rupee-sign"></i> Monthly Limit (₹)</label>
+                <div class="input-wrapper">
+                    <input type="number" name="limitAmount" step="0.01" min="0.01"
+                           th:value="${budget.limitAmount}" placeholder="Enter amount" required>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn-primary"><i class="fas fa-save"></i> Update Budget</button>
+                <a href="/budgets" class="btn-secondary"><i class="fas fa-times"></i> Cancel</a>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggleBtn = document.querySelector('.nav-toggle');
+        const nav = document.querySelector('.navbar-nav');
+        if (toggleBtn && nav) {
+            toggleBtn.addEventListener('click', function() { nav.classList.toggle('open'); });
+            nav.querySelectorAll('a').forEach(function(link) {
+                link.addEventListener('click', function() { nav.classList.remove('open'); });
+            });
+        }
+        document.addEventListener('click', function(e) {
+            if (nav && nav.classList.contains('open')) {
+                const isNav = nav.contains(e.target);
+                const isToggle = toggleBtn && toggleBtn.contains(e.target);
+                if (!isNav && !isToggle) { nav.classList.remove('open'); }
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

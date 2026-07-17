@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expenses — Expense Tracker</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        /* ============================================================
+           RESET & BASE
+           ============================================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #111318;
+            color: #F2EFE9;
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #111318;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #262A34;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #E4A96F;
+        }
+
+        /* ============================================================
+           NAVBAR
+           ============================================================ */
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(17, 19, 24, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(38, 42, 52, 0.6);
+            padding: 0 32px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .navbar-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: #F2EFE9;
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .navbar-logo .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #E4A96F, #d4945e);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: #3A2A16;
+        }
+
+        .navbar-logo span {
+            color: #E4A96F;
+        }
+
+        .navbar-nav {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            list-style: none;
+            margin: 0 24px;
+        }
+
+        .navbar-nav a {
+            color: #8E93A0;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.15s ease;
+            position: relative;
+        }
+
+        .navbar-nav a:hover {
+            color: #F2EFE9;
+            background: rgba(38, 42, 52, 0.5);
+        }
+
+        .navbar-nav a.active {
+            color: #F2EFE9;
+            background: rgba(38, 42, 52, 0.5);
+        }
+
+        .navbar-nav a.active::after {
+            content: '';
+            position: absolute;
+            bottom: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 2px;
+            border-radius: 2px;
+            background: #E4A96F;
+        }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .navbar-user {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 4px 12px 4px 4px;
+            border-radius: 100px;
+            background: rgba(38, 42, 52, 0.3);
+            border: 1px solid rgba(38, 42, 52, 0.5);
+            transition: all 0.15s ease;
+        }
+
+        .navbar-user:hover {
+            border-color: rgba(228, 169, 111, 0.3);
+        }
+
+        .navbar-user .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #E4A96F, #d4945e);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: #3A2A16;
+            text-transform: uppercase;
+        }
+
+        .navbar-user .username {
+            font-size: 13px;
+            font-weight: 500;
+            color: #F2EFE9;
+        }
+
+        .navbar-user .logout-btn {
+            background: none;
+            border: none;
+            color: #8E93A0;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: all 0.15s ease;
+        }
+
+        .navbar-user .logout-btn:hover {
+            color: #F2555A;
+            background: rgba(242, 85, 90, 0.1);
+        }
+
+        .nav-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: #F2EFE9;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 4px 8px;
+        }
+
+        /* ============================================================
+           CONTAINER
+           ============================================================ */
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 32px 32px 60px;
+        }
+
+        /* ============================================================
+           PAGE HEADER
+           ============================================================ */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 12px;
+            animation: fadeInUp 0.4s ease forwards;
+        }
+
+        .page-header-left h1 {
+            font-size: 28px;
+            font-weight: 800;
+            color: #F2EFE9;
+            letter-spacing: -0.5px;
+        }
+
+        .page-header-left p {
+            color: #8E93A0;
+            font-size: 14px;
+            margin-top: 2px;
+        }
+
+        .page-header-left p span {
+            color: #F2EFE9;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 24px;
+            background: linear-gradient(135deg, #E4A96F, #d4945e);
+            color: #3A2A16;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            box-shadow: 0 4px 20px rgba(228, 169, 111, 0.25);
+            letter-spacing: -0.2px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px) scale(1.01);
+            box-shadow: 0 8px 30px rgba(228, 169, 111, 0.35);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary i {
+            font-size: 16px;
+        }
+
+        /* ============================================================
+           FILTER FORM
+           ============================================================ */
+        .filter-form {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+            background: #1B1E26;
+            padding: 16px 20px;
+            border-radius: 16px;
+            border: 1px solid #262A34;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+            margin-bottom: 24px;
+            animation: fadeInUp 0.4s ease 0.1s forwards;
+            opacity: 0;
+        }
+
+        .filter-form .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-form .filter-group label {
+            color: #8E93A0;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .filter-form input,
+        .filter-form select {
+            padding: 8px 14px;
+            background: #111318;
+            border: 1px solid #262A34;
+            border-radius: 10px;
+            color: #F2EFE9;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.15s ease;
+            outline: none;
+            min-width: 140px;
+        }
+
+        .filter-form input:focus,
+        .filter-form select:focus {
+            border-color: #E4A96F;
+            box-shadow: 0 0 0 3px rgba(228, 169, 111, 0.1);
+        }
+
+        .filter-form input::placeholder {
+            color: #8E93A0;
+        }
+
+        .filter-form select option {
+            background: #1B1E26;
+            color: #F2EFE9;
+        }
+
+        .filter-form .btn-filter {
+            padding: 8px 20px;
+            background: #E4A96F;
+            color: #3A2A16;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .filter-form .btn-filter:hover {
+            background: #d4945e;
+            transform: translateY(-1px);
+        }
+
+        .filter-form .btn-clear {
+            padding: 8px 16px;
+            background: transparent;
+            color: #8E93A0;
+            border: 1px solid #262A34;
+            border-radius: 10px;
+            font-weight: 500;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            text-decoration: none;
+        }
+
+        .filter-form .btn-clear:hover {
+            color: #F2EFE9;
+            border-color: #E4A96F;
+        }
+
+        /* ============================================================
+           TABLE
+           ============================================================ */
+        .table-wrapper {
+            background: #1B1E26;
+            border-radius: 16px;
+            border: 1px solid #262A34;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+            animation: fadeInUp 0.4s ease 0.2s forwards;
+            opacity: 0;
+        }
+
+        .expense-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .expense-table thead {
+            background: rgba(17, 19, 24, 0.5);
+        }
+
+        .expense-table thead th {
+            padding: 14px 20px;
+            text-align: left;
+            color: #8E93A0;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            border-bottom: 1px solid #262A34;
+        }
+
+        .expense-table thead th:last-child {
+            text-align: right;
+        }
+
+        .expense-table tbody td {
+            padding: 14px 20px;
+            border-bottom: 1px solid rgba(38, 42, 52, 0.5);
+            color: #F2EFE9;
+            font-size: 14px;
+            vertical-align: middle;
+        }
+
+        .expense-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .expense-table tbody tr:hover td {
+            background: rgba(38, 42, 52, 0.3);
+        }
+
+        .expense-table .category-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 100px;
+            background: rgba(228, 169, 111, 0.1);
+            color: #E4A96F;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .expense-table .category-badge i {
+            font-size: 11px;
+        }
+
+        .expense-table .payment-method {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #8E93A0;
+            font-size: 13px;
+        }
+
+        .expense-table .payment-method i {
+            font-size: 13px;
+        }
+
+        .expense-table .amount-col {
+            font-weight: 600;
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .expense-table .amount-col.positive {
+            color: #4ADE9B;
+        }
+
+        .expense-table .amount-col.negative {
+            color: #F2555A;
+        }
+
+        .expense-table .actions {
+            display: flex;
+            gap: 6px;
+            justify-content: flex-end;
+        }
+
+        .expense-table .actions .btn-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            text-decoration: none;
+            background: transparent;
+            color: #8E93A0;
+            font-size: 14px;
+        }
+
+        .expense-table .actions .btn-icon:hover {
+            background: rgba(38, 42, 52, 0.5);
+        }
+
+        .expense-table .actions .btn-icon.edit:hover {
+            color: #E4A96F;
+        }
+
+        .expense-table .actions .btn-icon.delete:hover {
+            color: #F2555A;
+            background: rgba(242, 85, 90, 0.1);
+        }
+
+        .expense-table .empty-state {
+            text-align: center;
+            padding: 48px 20px;
+            color: #8E93A0;
+        }
+
+        .expense-table .empty-state .empty-icon {
+            font-size: 48px;
+            color: #262A34;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .expense-table .empty-state a {
+            color: #E4A96F;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.15s ease;
+        }
+
+        .expense-table .empty-state a:hover {
+            color: #d4945e;
+        }
+
+        /* ============================================================
+           ANIMATIONS
+           ============================================================ */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ============================================================
+           RESPONSIVE
+           ============================================================ */
+        @media (max-width: 1024px) {
+            .filter-form {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .filter-form .filter-group {
+                flex-wrap: wrap;
+            }
+
+            .filter-form input,
+            .filter-form select {
+                flex: 1;
+                min-width: 100px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 0 16px;
+            }
+
+            .navbar-nav {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 64px;
+                left: 0;
+                right: 0;
+                background: #1B1E26;
+                border-bottom: 1px solid #262A34;
+                padding: 8px 16px;
+                gap: 2px;
+                margin: 0;
+            }
+
+            .navbar-nav.open {
+                display: flex;
+            }
+
+            .navbar-nav a {
+                padding: 10px 12px;
+                width: 100%;
+            }
+
+            .navbar-nav a.active::after {
+                display: none;
+            }
+
+            .nav-toggle {
+                display: block;
+            }
+
+            .container {
+                padding: 20px 16px 40px;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+
+            .page-header-left h1 {
+                font-size: 22px;
+            }
+
+            .page-header .btn-primary {
+                justify-content: center;
+            }
+
+            .expense-table thead th,
+            .expense-table tbody td {
+                padding: 10px 14px;
+                font-size: 13px;
+            }
+
+            .expense-table .hide-mobile {
+                display: none;
+            }
+
+            .expense-table .actions .btn-icon {
+                width: 28px;
+                height: 28px;
+                font-size: 12px;
+            }
+
+            .navbar-user .username {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .filter-form input,
+            .filter-form select {
+                min-width: 100%;
+            }
+
+            .filter-form .filter-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .expense-table thead th:nth-child(3),
+            .expense-table tbody td:nth-child(3) {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ============================================================
+NAVBAR
+============================================================ -->
+<nav class="navbar">
+    <div class="navbar-left">
+        <button class="nav-toggle" aria-label="Toggle navigation">
+            <i class="fas fa-bars"></i>
+        </button>
+        <a href="/dashboard" class="navbar-logo">
+            <span class="logo-icon"><i class="fas fa-wallet"></i></span>
+            Expense<span>Tracker</span>
+        </a>
+        <ul class="navbar-nav" id="navbarNav">
+            <li><a href="/dashboard"><i class="fas fa-th-large" style="margin-right: 6px;"></i> Dashboard</a></li>
+            <li><a href="/expenses" class="active"><i class="fas fa-receipt" style="margin-right: 6px;"></i> Expenses</a></li>
+            <li><a href="/categories"><i class="fas fa-tags" style="margin-right: 6px;"></i> Categories</a></li>
+            <li><a href="/budgets"><i class="fas fa-piggy-bank" style="margin-right: 6px;"></i> Budgets</a></li>
+        </ul>
+    </div>
+    <div class="navbar-right">
+        <div class="navbar-user">
+            <span class="avatar" th:text="${#strings.substring(username, 0, 1)}">U</span>
+            <span class="username" th:text="${username}">User</span>
+            <form th:action="@{/logout}" method="post" style="display:inline;">
+                <button type="submit" class="logout-btn"><i class="fas fa-sign-out-alt"></i></button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<!-- ============================================================
+MAIN CONTENT
+============================================================ -->
+<div class="container">
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="page-header-left">
+            <h1>All Expenses</h1>
+            <p>Manage and track all your expenses</p>
+        </div>
+        <a href="/expenses/add" class="btn-primary">
+            <i class="fas fa-plus-circle"></i> Add Expense
+        </a>
+    </div>
+
+    <!-- Filter Form -->
+    <form class="filter-form" th:action="@{/expenses/filter}" method="get">
+        <div class="filter-group">
+            <label><i class="fas fa-calendar-alt"></i> From</label>
+            <input type="date" name="startDate" th:value="${startDate}" placeholder="Start Date">
+        </div>
+        <div class="filter-group">
+            <label><i class="fas fa-calendar-alt"></i> To</label>
+            <input type="date" name="endDate" th:value="${endDate}" placeholder="End Date">
+        </div>
+        <div class="filter-group">
+            <label><i class="fas fa-tag"></i> Category</label>
+            <select name="categoryId">
+                <option value="">All Categories</option>
+                <option th:each="cat : ${categories}"
+                        th:value="${cat.id}"
+                        th:text="${cat.name}"
+                        th:selected="${selectedCategory == cat.id}">
+                </option>
+            </select>
+        </div>
+        <button type="submit" class="btn-filter">
+            <i class="fas fa-search"></i> Filter
+        </button>
+        <a href="/expenses" class="btn-clear">
+            <i class="fas fa-times"></i> Clear
+        </a>
+    </form>
+
+    <!-- Expense Table -->
+    <div class="table-wrapper">
+        <table class="expense-table">
+            <thead>
+            <tr>
+                <th>Date</th>
+                <th>Description</th>
+                <th class="hide-mobile">Category</th>
+                <th class="hide-mobile">Payment</th>
+                <th>Amount</th>
+                <th style="text-align: right;">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="expense : ${expenses}" th:if="${expenses != null and !expenses.empty}">
+                <td th:text="${#dates.format(expense.date, 'dd MMM yyyy')}">15 Jul 2026</td>
+                <td th:text="${expense.description}">Lunch with team</td>
+                <td class="hide-mobile">
+                            <span class="category-badge">
+                                <i class="fas fa-tag"></i>
+                                <span th:text="${expense.categoryName}">Food</span>
+                            </span>
+                </td>
+                <td class="hide-mobile">
+                            <span class="payment-method">
+                                <i class="fas"
+                                   th:classappend="${expense.paymentMethod == 'CASH'} ? 'fa-money-bill-wave' :
+                                                   ${expense.paymentMethod == 'CREDIT_CARD'} ? 'fa-credit-card' :
+                                                   ${expense.paymentMethod == 'DEBIT_CARD'} ? 'fa-credit-card' :
+                                                   ${expense.paymentMethod == 'BANK_TRANSFER'} ? 'fa-university' :
+                                                   ${expense.paymentMethod == 'UPI'} ? 'fa-mobile-alt' :
+                                                   ${expense.paymentMethod == 'CHEQUE'} ? 'fa-file-invoice' : 'fa-wallet'">
+                                </i>
+                                <span th:text="${expense.paymentMethod}">Cash</span>
+                            </span>
+                </td>
+                <td class="amount-col positive">₹<span th:text="${#numbers.formatDecimal(expense.amount, 0, 2)}">45.50</span></td>
+                <td>
+                    <div class="actions">
+                        <a th:href="@{/expenses/edit/{id}(id=${expense.id})}" class="btn-icon edit" title="Edit">
+                            <i class="fas fa-pen"></i>
+                        </a>
+                        <a th:href="@{/expenses/delete/{id}(id=${expense.id})}" class="btn-icon delete" title="Delete" onclick="return confirm('Delete this expense?')">
+                            <i class="fas fa-trash-alt"></i>
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            <tr th:if="${expenses == null or expenses.empty}">
+                <td colspan="6" class="empty-state">
+                    <span class="empty-icon"><i class="fas fa-receipt"></i></span>
+                    <div style="font-size: 18px; font-weight: 600; color: #F2EFE9; margin-bottom: 4px;">No expenses found</div>
+                    <div style="margin-bottom: 12px;">Start tracking your spending today.</div>
+                    <a href="/expenses/add"><i class="fas fa-plus-circle"></i> Add your first expense</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<!-- ============================================================
+JAVASCRIPT
+============================================================ -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+
+        // Mobile nav toggle
+        const toggleBtn = document.querySelector('.nav-toggle');
+        const nav = document.querySelector('.navbar-nav');
+
+        if (toggleBtn && nav) {
+            toggleBtn.addEventListener('click', function() {
+                nav.classList.toggle('open');
+            });
+
+            nav.querySelectorAll('a').forEach(function(link) {
+                link.addEventListener('click', function() {
+                    nav.classList.remove('open');
+                });
+            });
+        }
+
+        document.addEventListener('click', function(e) {
+            if (nav && nav.classList.contains('open')) {
+                const isNav = nav.contains(e.target);
+                const isToggle = toggleBtn && toggleBtn.contains(e.target);
+                if (!isNav && !isToggle) {
+                    nav.classList.remove('open');
+                }
+            }
+        });
+
+    });
+</script>
+
+</body>
+</html>

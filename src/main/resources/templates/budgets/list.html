@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budgets — Expense Tracker</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        /* ============================================================
+           RESET & BASE
+           ============================================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #111318;
+            color: #F2EFE9;
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #111318;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #262A34;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #E4A96F;
+        }
+
+        /* ============================================================
+           NAVBAR
+           ============================================================ */
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(17, 19, 24, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(38, 42, 52, 0.6);
+            padding: 0 32px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .navbar-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: #F2EFE9;
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .navbar-logo .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #E4A96F, #d4945e);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: #3A2A16;
+        }
+
+        .navbar-logo span {
+            color: #E4A96F;
+        }
+
+        .navbar-nav {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            list-style: none;
+            margin: 0 24px;
+        }
+
+        .navbar-nav a {
+            color: #8E93A0;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.15s ease;
+            position: relative;
+        }
+
+        .navbar-nav a:hover {
+            color: #F2EFE9;
+            background: rgba(38, 42, 52, 0.5);
+        }
+
+        .navbar-nav a.active {
+            color: #F2EFE9;
+            background: rgba(38, 42, 52, 0.5);
+        }
+
+        .navbar-nav a.active::after {
+            content: '';
+            position: absolute;
+            bottom: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 2px;
+            border-radius: 2px;
+            background: #E4A96F;
+        }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .navbar-user {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 4px 12px 4px 4px;
+            border-radius: 100px;
+            background: rgba(38, 42, 52, 0.3);
+            border: 1px solid rgba(38, 42, 52, 0.5);
+            transition: all 0.15s ease;
+        }
+
+        .navbar-user:hover {
+            border-color: rgba(228, 169, 111, 0.3);
+        }
+
+        .navbar-user .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #E4A96F, #d4945e);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: #3A2A16;
+            text-transform: uppercase;
+        }
+
+        .navbar-user .username {
+            font-size: 13px;
+            font-weight: 500;
+            color: #F2EFE9;
+        }
+
+        .navbar-user .logout-btn {
+            background: none;
+            border: none;
+            color: #8E93A0;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: all 0.15s ease;
+        }
+
+        .navbar-user .logout-btn:hover {
+            color: #F2555A;
+            background: rgba(242, 85, 90, 0.1);
+        }
+
+        .nav-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: #F2EFE9;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 4px 8px;
+        }
+
+        /* ============================================================
+           CONTAINER
+           ============================================================ */
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 32px 32px 60px;
+        }
+
+        /* ============================================================
+           PAGE HEADER
+           ============================================================ */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 12px;
+            animation: fadeInUp 0.4s ease forwards;
+        }
+
+        .page-header-left h1 {
+            font-size: 28px;
+            font-weight: 800;
+            color: #F2EFE9;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .page-header-left h1 i {
+            color: #E4A96F;
+            font-size: 26px;
+        }
+
+        .page-header-left p {
+            color: #8E93A0;
+            font-size: 14px;
+            margin-top: 2px;
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 24px;
+            background: linear-gradient(135deg, #E4A96F, #d4945e);
+            color: #3A2A16;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            box-shadow: 0 4px 20px rgba(228, 169, 111, 0.25);
+            letter-spacing: -0.2px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px) scale(1.01);
+            box-shadow: 0 8px 30px rgba(228, 169, 111, 0.35);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary i {
+            font-size: 16px;
+        }
+
+        /* ============================================================
+           EXCEEDED BANNER
+           ============================================================ */
+        .exceeded-banner {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            background: rgba(242, 85, 90, 0.08);
+            border: 1px solid rgba(242, 85, 90, 0.15);
+            border-radius: 12px;
+            color: #F2555A;
+            font-size: 14px;
+            margin-bottom: 24px;
+            animation: fadeInUp 0.4s ease 0.05s forwards;
+            opacity: 0;
+        }
+
+        .exceeded-banner i {
+            font-size: 18px;
+        }
+
+        .exceeded-banner strong {
+            color: #F2EFE9;
+            font-weight: 600;
+        }
+
+        /* ============================================================
+           BUDGET GRID
+           ============================================================ */
+        .budget-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 16px;
+        }
+
+        .budget-card {
+            background: #1B1E26;
+            border-radius: 16px;
+            border: 1px solid #262A34;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+            padding: 22px 24px 20px;
+            transition: all 0.2s ease;
+            animation: fadeInUp 0.4s ease forwards;
+            opacity: 0;
+        }
+
+        .budget-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+            border-color: rgba(228, 169, 111, 0.1);
+        }
+
+        .budget-card .budget-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 14px;
+        }
+
+        .budget-card .budget-category {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .budget-card .budget-category .cat-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: rgba(228, 169, 111, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #E4A96F;
+            font-size: 14px;
+        }
+
+        .budget-card .budget-category .cat-name {
+            font-weight: 600;
+            color: #F2EFE9;
+            font-size: 15px;
+        }
+
+        .budget-card .budget-amounts {
+            text-align: right;
+        }
+
+        .budget-card .budget-amounts .limit {
+            font-size: 22px;
+            font-weight: 800;
+            color: #F2EFE9;
+            letter-spacing: -0.5px;
+        }
+
+        .budget-card .budget-amounts .spent {
+            font-size: 13px;
+            color: #8E93A0;
+            display: block;
+            margin-top: 2px;
+        }
+
+        .budget-card .budget-amounts .spent strong {
+            color: #F2EFE9;
+            font-weight: 600;
+        }
+
+        .budget-card .budget-amounts .spent.over {
+            color: #F2555A;
+        }
+
+        .budget-card .budget-amounts .spent.under {
+            color: #4ADE9B;
+        }
+
+        .budget-card .budget-bar {
+            width: 100%;
+            height: 6px;
+            background: #262A34;
+            border-radius: 100px;
+            overflow: hidden;
+            margin: 14px 0 10px;
+        }
+
+        .budget-card .budget-bar .fill {
+            height: 100%;
+            border-radius: 100px;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .budget-card .budget-bar .fill.success {
+            background: linear-gradient(90deg, #4ADE9B, #2ecc71);
+        }
+        .budget-card .budget-bar .fill.warning {
+            background: linear-gradient(90deg, #E4A96F, #d4945e);
+            box-shadow: 0 0 20px rgba(228, 169, 111, 0.2);
+        }
+        .budget-card .budget-bar .fill.danger {
+            background: linear-gradient(90deg, #F2555A, #e74c3c);
+            box-shadow: 0 0 20px rgba(242, 85, 90, 0.2);
+        }
+
+        .budget-card .budget-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 4px;
+        }
+
+        .budget-card .budget-footer .percentage {
+            font-size: 14px;
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .budget-card .budget-footer .percentage.under {
+            color: #4ADE9B;
+        }
+
+        .budget-card .budget-footer .percentage.over {
+            color: #F2555A;
+        }
+
+        .budget-card .budget-footer .status-badge {
+            font-size: 12px;
+            font-weight: 500;
+            padding: 4px 14px;
+            border-radius: 100px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .budget-card .budget-footer .status-badge.on-track {
+            background: rgba(74, 222, 155, 0.1);
+            color: #4ADE9B;
+        }
+
+        .budget-card .budget-footer .status-badge.over {
+            background: rgba(242, 85, 90, 0.1);
+            color: #F2555A;
+        }
+
+        .budget-card .budget-footer .status-badge i {
+            font-size: 12px;
+        }
+
+        .budget-card .budget-actions {
+            margin-top: 16px;
+            padding-top: 14px;
+            border-top: 1px solid #262A34;
+            display: flex;
+            gap: 8px;
+        }
+
+        .budget-card .budget-actions .btn-sm {
+            padding: 6px 16px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 500;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .budget-card .budget-actions .btn-edit {
+            background: rgba(228, 169, 111, 0.1);
+            color: #E4A96F;
+            border: none;
+        }
+
+        .budget-card .budget-actions .btn-edit:hover {
+            background: rgba(228, 169, 111, 0.2);
+        }
+
+        .budget-card .budget-actions .btn-delete {
+            background: rgba(242, 85, 90, 0.1);
+            color: #F2555A;
+            border: none;
+        }
+
+        .budget-card .budget-actions .btn-delete:hover {
+            background: rgba(242, 85, 90, 0.2);
+        }
+
+        /* ============================================================
+           EMPTY STATE
+           ============================================================ */
+        .empty-state {
+            text-align: center;
+            padding: 56px 20px;
+            background: #1B1E26;
+            border-radius: 16px;
+            border: 1px solid #262A34;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+            color: #8E93A0;
+            grid-column: 1 / -1;
+        }
+
+        .empty-state .empty-icon {
+            font-size: 56px;
+            color: #262A34;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .empty-state .empty-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #F2EFE9;
+            margin-bottom: 4px;
+        }
+
+        .empty-state a {
+            color: #E4A96F;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.15s ease;
+        }
+
+        .empty-state a:hover {
+            color: #d4945e;
+        }
+
+        /* ============================================================
+           ANIMATIONS
+           ============================================================ */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .delay-1 { animation-delay: 0.05s; }
+        .delay-2 { animation-delay: 0.10s; }
+        .delay-3 { animation-delay: 0.15s; }
+        .delay-4 { animation-delay: 0.20s; }
+        .delay-5 { animation-delay: 0.25s; }
+
+        /* ============================================================
+           RESPONSIVE
+           ============================================================ */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 0 16px;
+            }
+
+            .navbar-nav {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 64px;
+                left: 0;
+                right: 0;
+                background: #1B1E26;
+                border-bottom: 1px solid #262A34;
+                padding: 8px 16px;
+                gap: 2px;
+                margin: 0;
+            }
+
+            .navbar-nav.open {
+                display: flex;
+            }
+
+            .navbar-nav a {
+                padding: 10px 12px;
+                width: 100%;
+            }
+
+            .navbar-nav a.active::after {
+                display: none;
+            }
+
+            .nav-toggle {
+                display: block;
+            }
+
+            .container {
+                padding: 20px 16px 40px;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+
+            .page-header-left h1 {
+                font-size: 22px;
+                justify-content: center;
+            }
+
+            .page-header .btn-primary {
+                justify-content: center;
+            }
+
+            .budget-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .budget-card {
+                padding: 18px 20px 16px;
+            }
+
+            .budget-card .budget-amounts .limit {
+                font-size: 18px;
+            }
+
+            .navbar-user .username {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .budget-card .budget-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .budget-card .budget-amounts {
+                text-align: left;
+                width: 100%;
+            }
+
+            .budget-card .budget-actions {
+                flex-direction: column;
+            }
+
+            .budget-card .budget-actions .btn-sm {
+                justify-content: center;
+            }
+
+            .exceeded-banner {
+                flex-direction: column;
+                align-items: flex-start;
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ============================================================
+NAVBAR
+============================================================ -->
+<nav class="navbar">
+    <div class="navbar-left">
+        <button class="nav-toggle" aria-label="Toggle navigation">
+            <i class="fas fa-bars"></i>
+        </button>
+        <a href="/dashboard" class="navbar-logo">
+            <span class="logo-icon"><i class="fas fa-wallet"></i></span>
+            Expense<span>Tracker</span>
+        </a>
+        <ul class="navbar-nav" id="navbarNav">
+            <li><a href="/dashboard"><i class="fas fa-th-large" style="margin-right: 6px;"></i> Dashboard</a></li>
+            <li><a href="/expenses"><i class="fas fa-receipt" style="margin-right: 6px;"></i> Expenses</a></li>
+            <li><a href="/categories"><i class="fas fa-tags" style="margin-right: 6px;"></i> Categories</a></li>
+            <li><a href="/budgets" class="active"><i class="fas fa-piggy-bank" style="margin-right: 6px;"></i> Budgets</a></li>
+        </ul>
+    </div>
+    <div class="navbar-right">
+        <div class="navbar-user">
+            <span class="avatar" th:text="${#strings.substring(username, 0, 1)}">U</span>
+            <span class="username" th:text="${username}">User</span>
+            <form th:action="@{/logout}" method="post" style="display:inline;">
+                <button type="submit" class="logout-btn"><i class="fas fa-sign-out-alt"></i></button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<!-- ============================================================
+MAIN CONTENT
+============================================================ -->
+<div class="container">
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="page-header-left">
+            <h1>
+                <i class="fas fa-piggy-bank"></i>
+                Budgets
+            </h1>
+            <p>Set and track monthly spending limits for your categories</p>
+        </div>
+        <a href="/budgets/add" class="btn-primary">
+            <i class="fas fa-plus-circle"></i> Set Budget
+        </a>
+    </div>
+
+    <!-- Exceeded Budgets Banner -->
+    <div th:if="${exceededBudgets != null and !exceededBudgets.empty}" class="exceeded-banner">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span>
+                You have <strong th:text="${#lists.size(exceededBudgets)}">0</strong>
+                budget(s) that have been exceeded. Review them below.
+            </span>
+    </div>
+
+    <!-- Budget Grid -->
+    <div class="budget-grid">
+        <div th:each="budget : ${budgets}" class="budget-card" th:classappend="${budget.percentageUsed > 100} ? 'delay-1' : 'delay-2'">
+            <div class="budget-header">
+                <div class="budget-category">
+                    <div class="cat-icon">
+                        <i class="fas fa-tag"></i>
+                    </div>
+                    <span class="cat-name" th:text="${budget.categoryName}">Food</span>
+                </div>
+                <div class="budget-amounts">
+                    <div class="limit">₹<span th:text="${#numbers.formatDecimal(budget.limitAmount, 0, 2)}">0.00</span></div>
+                    <span class="spent" th:classappend="${budget.percentageUsed > 100} ? 'over' : 'under'">
+                            Spent: ₹<span th:text="${#numbers.formatDecimal(budget.spentAmount, 0, 2)}">0.00</span>
+                        </span>
+                </div>
+            </div>
+
+            <div class="budget-bar">
+                <div class="fill"
+                     th:classappend="${budget.percentageUsed > 100} ? 'danger' : (${budget.percentageUsed > 80} ? 'warning' : 'success')"
+                     th:style="'width: ' + ${budget.percentageUsed} + '%'">
+                </div>
+            </div>
+
+            <div class="budget-footer">
+                    <span class="percentage"
+                          th:classappend="${budget.percentageUsed > 100} ? 'over' : 'under'"
+                          th:text="${#numbers.formatDecimal(budget.percentageUsed, 0, 1)} + '% used'">
+                        75% used
+                    </span>
+                <span class="status-badge"
+                      th:classappend="${budget.percentageUsed > 100} ? 'over' : 'on-track'">
+                        <i class="fas"
+                           th:classappend="${budget.percentageUsed > 100} ? 'fa-exclamation-circle' : 'fa-check-circle'"></i>
+                        <span th:if="${budget.percentageUsed > 100}">Over</span>
+                        <span th:if="${budget.percentageUsed <= 100}">On track</span>
+                    </span>
+            </div>
+
+            <div class="budget-actions">
+                <a th:href="@{/budgets/edit/{id}(id=${budget.id})}" class="btn-sm btn-edit">
+                    <i class="fas fa-pen"></i> Edit
+                </a>
+                <a th:href="@{/budgets/delete/{id}(id=${budget.id})}" class="btn-sm btn-delete" onclick="return confirm('Delete this budget?')">
+                    <i class="fas fa-trash-alt"></i> Delete
+                </a>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div th:if="${budgets == null or budgets.empty}" class="empty-state">
+            <span class="empty-icon"><i class="fas fa-piggy-bank"></i></span>
+            <div class="empty-title">No budgets set</div>
+            <p style="margin-bottom: 8px;">Set monthly budgets to track your spending limits.</p>
+            <a href="/budgets/add">Set your first budget</a>
+        </div>
+    </div>
+
+</div>
+
+<!-- ============================================================
+JAVASCRIPT
+============================================================ -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+
+        // Mobile nav toggle
+        const toggleBtn = document.querySelector('.nav-toggle');
+        const nav = document.querySelector('.navbar-nav');
+
+        if (toggleBtn && nav) {
+            toggleBtn.addEventListener('click', function() {
+                nav.classList.toggle('open');
+            });
+
+            nav.querySelectorAll('a').forEach(function(link) {
+                link.addEventListener('click', function() {
+                    nav.classList.remove('open');
+                });
+            });
+        }
+
+        document.addEventListener('click', function(e) {
+            if (nav && nav.classList.contains('open')) {
+                const isNav = nav.contains(e.target);
+                const isToggle = toggleBtn && toggleBtn.contains(e.target);
+                if (!isNav && !isToggle) {
+                    nav.classList.remove('open');
+                }
+            }
+        });
+
+        // Animate progress bars on load
+        const bars = document.querySelectorAll('.budget-bar .fill');
+        bars.forEach(function(bar) {
+            const targetWidth = bar.style.width;
+            bar.style.width = '0%';
+            setTimeout(function() {
+                bar.style.width = targetWidth;
+            }, 400);
+        });
+
+    });
+</script>
+
+</body>
+</html>
